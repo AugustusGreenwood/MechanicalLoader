@@ -11,7 +11,7 @@ typedef struct Device {
 } Device;
 
 Result _writeToControl(Device device, const int value);
-Result _commandUnderstood(const char *response);
+Result _commandUnderstood(const unsigned char *response);
 Result _clearReadBuffer(Device device);
 Result openDevice(Device *device);
 Result readFromBulk(Device device, unsigned char output[64]);

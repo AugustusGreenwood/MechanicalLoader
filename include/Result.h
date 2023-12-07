@@ -51,13 +51,19 @@
         }                                                                                \
     } while (0)
 
+#define HANDLE_ERROR_DONT_RETURN(expr, msg)                                              \
+    do {                                                                                 \
+        Result result = (expr);                                                          \
+        if (result != SUCCESS) {                                                         \
+            LOG_ERROR(result, msg);                                                      \
+        }                                                                                \
+    } while (0)
+
+// These are all just libusb errors
 typedef enum Result {
+    ARCUS_ERROR = 1,
+
     SUCCESS = 0,
-
-    // My errors
-    BAD_COMMAND = 1,
-
-    // Libusb errors
     IO_ERROR = -1,
     INVALID_PARAM_ERROR = -2,
     ACCESS_ERROR = -3,

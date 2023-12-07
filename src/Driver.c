@@ -12,9 +12,9 @@ Result _writeToControl(Device device, const int value) {
     return SUCCESS;
 }
 
-Result _commandUnderstood(const char *response) {
+Result _commandUnderstood(const unsigned char *response) {
     if (response[0] == '?') {
-        return BAD_COMMAND;
+        return IO_ERROR;
     }
     return SUCCESS;
 }
@@ -22,9 +22,10 @@ Result _commandUnderstood(const char *response) {
 Result _clearReadBuffer(Device device) {
     unsigned char _buffer[4096];
     int transferred;
-    HANDLE_ERROR(libusb_bulk_transfer(device.handle, 0x82, _buffer, sizeof(_buffer),
-                                      &transferred, TIMEOUT),
-                 "Failed to clear read buffer with libusb error");
+    HANDLE_ERROR_UNLESS(TIMEOUT_ERROR,
+                        libusb_bulk_transfer(device.handle, 0x82, _buffer,
+                                             sizeof(_buffer), &transferred, TIMEOUT),
+                        "Failed to clear read buffer with libusb error");
 
     return SUCCESS;
 }
@@ -66,8 +67,9 @@ Result openDevice(Device *device) {
 
 Result readFromBulk(Device device, unsigned char output[64]) {
     int amt_read;
-    HANDLE_ERROR(libusb_bulk_transfer(device.handle, 0x82, output, 8, &amt_read, TIMEOUT),
-                 "Failed to read from bulk with libusb error");
+    HANDLE_ERROR(
+        libusb_bulk_transfer(device.handle, 0x82, output, 64, &amt_read, TIMEOUT),
+        "Failed to read from bulk with libusb error");
 
     return SUCCESS;
 }
@@ -75,10 +77,10 @@ Result readFromBulk(Device device, unsigned char output[64]) {
 Result writeToBulk(Device device, unsigned char command[64]) {
     int amt_written;
     HANDLE_ERROR(
-        libusb_bulk_transfer(device.handle, 0x02, command, 8, &amt_written, TIMEOUT),
+        libusb_bulk_transfer(device.handle, 0x02, command, 64, &amt_written, TIMEOUT),
         "Failed to write to bulk with libusb error");
 
-    if (amt_written != 8) {
+    if (amt_written != 64) {
         HANDLE_ERROR(IO_ERROR, "Amount written to bulk was incorrect");
     }
     return SUCCESS;
@@ -99,6 +101,7 @@ Result sendCommandGetResponse(Device device, unsigned char command[64],
                               unsigned char response[64]) {
     HANDLE_ERROR(writeToBulk(device, command), "Failed to write command to bulk");
     HANDLE_ERROR(readFromBulk(device, response), "Failed to read response from bulk");
+    HANDLE_ERROR_DONT_RETURN(_commandUnderstood(response), "Command was not understood");
     return SUCCESS;
 }
 
@@ -107,5 +110,3 @@ Result _flushDevice(Device device) {
                  "Failed to send flush command to control");
     return SUCCESS;
 }
-
-void thing() {}

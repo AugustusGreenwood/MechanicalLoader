@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.27.9)
+cmake_minimum_required(VERSION 3.16)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_COMPILER "clang")
 set(CMAKE_CXX_COMPILER "clang++")
@@ -10,6 +10,7 @@ include_directories(include)
 set(SOURCE_FILES
     src/main.c
     src/Driver.c
+    src/Control.c
 )
 
 option(DEBUGLOG "Print all debug information" ON)
