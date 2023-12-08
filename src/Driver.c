@@ -1,7 +1,7 @@
 #include "Driver.h"
 #include "Result.h"
 
-const int TIMEOUT = 1000;
+const int TIMEOUT = 3000;
 const int VENDOR_ID = 0x1589;
 const int PRODUCT_ID = 0xa101;
 
@@ -71,6 +71,9 @@ Result readFromBulk(Device device, unsigned char output[64]) {
         libusb_bulk_transfer(device.handle, 0x82, output, 64, &amt_read, TIMEOUT),
         "Failed to read from bulk with libusb error");
 
+    if (amt_read != 64) {
+        HANDLE_ERROR(IO_ERROR, "Amount written to bulk was incorrect");
+    }
     return SUCCESS;
 }
 
@@ -99,6 +102,7 @@ Result closeDevice(Device device) {
 
 Result sendCommandGetResponse(Device device, unsigned char command[64],
                               unsigned char response[64]) {
+    HANDLE_ERROR_DONT_RETURN(_clearReadBuffer(device), "Failed to clear read buffer");
     HANDLE_ERROR(writeToBulk(device, command), "Failed to write command to bulk");
     HANDLE_ERROR(readFromBulk(device, response), "Failed to read response from bulk");
     HANDLE_ERROR_DONT_RETURN(_commandUnderstood(response), "Command was not understood");
