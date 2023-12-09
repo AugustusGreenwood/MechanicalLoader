@@ -1,10 +1,4 @@
 #include "Control.h"
-#include <bits/time.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <unistd.h>
 
 /*
 All these function will follow a general structure:
@@ -98,10 +92,10 @@ Result setRelativeMovement(Device device) {
 }
 
 // TODO error message
-Result setPosition(Device device, int idle_time) {
+Result setPosition(Device device, int position) {
     unsigned char response[64];
     unsigned char command[64];
-    sprintf((char *)command, "PX=%i", idle_time);
+    sprintf((char *)command, "PX=%i", position);
 
     HANDLE_ERROR(sendCommandGetResponse(device, command, response), "MESSAGE");
     return SUCCESS;
@@ -164,9 +158,23 @@ double _getElapsedTime(struct timespec start_time, struct timespec end_time) {
 }
 
 // TODO Error message and write to file
-Result waitForMotorIdle(Device device, FILE *file, struct timespec time) {
+Result waitForMotorIdle(Device device, FILE *file, struct timespec start_time,
+                        struct timespec current_time) {
+    if (file == NULL) {
+        int status;
+        do {
+            HANDLE_ERROR(getMotorStatus(device, &status), "MESSAHE");
+        } while (status != 0);
+        return SUCCESS;
+    }
+
     int status;
+    int position;
+    double time;
     do {
+        HANDLE_ERROR(getPosition(device, &position), "MESSAHE");
+        time = _getElapsedTime(start_time, current_time);
+        fprintf(file, "%i,%lf\n", position, time);
         HANDLE_ERROR(getMotorStatus(device, &status), "MESSAHE");
     } while (status != 0);
     return SUCCESS;

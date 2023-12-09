@@ -62,6 +62,7 @@
 // These are all just libusb errors
 typedef enum Result {
     ARCUS_ERROR = 1,
+    INPUT_ERROR = 2,
 
     SUCCESS = 0,
     IO_ERROR = -1,

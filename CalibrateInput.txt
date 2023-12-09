@@ -1,0 +1,10 @@
+HighSpeed 100
+AccelerationTime 1
+IdleTime 1
+AveragingCycles 3
+Amplitude 400
+Period 3
+DwellTime 1
+Factor 2
+MaxSpeed 100000
+Tolerance 0.99

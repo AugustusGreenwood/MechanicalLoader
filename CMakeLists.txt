@@ -5,12 +5,16 @@ set(CMAKE_CXX_COMPILER "clang++")
 
 project(MechanicalLoader)
 
-include_directories(include)
+include_directories(
+    src/driver/
+    src/control/
+)
 
 set(SOURCE_FILES
     src/main.c
-    src/Driver.c
-    src/Control.c
+    src/driver/driver.c
+    src/control/control.c
+    src/control/calibration.c
 )
 
 option(DEBUGLOG "Print all debug information" ON)
@@ -18,7 +22,7 @@ if(DEBUGLOG)
     add_definitions(-DDEBUGLOG)
 endif(DEBUGLOG)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native -Wall -Wextra")
 
 add_executable(MechanicalLoader ${SOURCE_FILES})
 

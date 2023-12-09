@@ -1,5 +1,4 @@
 #include "Driver.h"
-#include "Result.h"
 
 const int TIMEOUT = 3000;
 const int VENDOR_ID = 0x1589;
@@ -27,6 +26,24 @@ Result _clearReadBuffer(Device device) {
                                              sizeof(_buffer), &transferred, TIMEOUT),
                         "Failed to clear read buffer with libusb error");
 
+    return SUCCESS;
+}
+
+Result _flushDevice(Device device) {
+    HANDLE_ERROR(_writeToControl(device, 0x01),
+                 "Failed to send flush command to control");
+    return SUCCESS;
+}
+
+Result _writeToBulk(Device device, unsigned char command[64]) {
+    int amt_written;
+    HANDLE_ERROR(
+        libusb_bulk_transfer(device.handle, 0x02, command, 64, &amt_written, TIMEOUT),
+        "Failed to write to bulk with libusb error");
+
+    if (amt_written != 64) {
+        HANDLE_ERROR(IO_ERROR, "Amount written to bulk was incorrect");
+    }
     return SUCCESS;
 }
 
@@ -61,29 +78,21 @@ Result openDevice(Device *device) {
     }
     libusb_free_device_list(list, 1);
 
-    HANDLE_ERROR(NOT_FOUND_ERROR, "All devices successfully iterated but specified "
-                                  "vendor and product ids not found");
+    // This gave an annoying "Not all path returned" or something so this doesn't
+    // return and instread i return at the nd of the function
+    HANDLE_ERROR_DONT_RETURN(NOT_FOUND_ERROR,
+                             "All devices successfully iterated but specified "
+                             "vendor and product ids not found");
+    return NOT_FOUND_ERROR;
 }
 
-Result readFromBulk(Device device, unsigned char output[64]) {
+Result _readFromBulk(Device device, unsigned char output[64]) {
     int amt_read;
     HANDLE_ERROR(
         libusb_bulk_transfer(device.handle, 0x82, output, 64, &amt_read, TIMEOUT),
         "Failed to read from bulk with libusb error");
 
     if (amt_read != 64) {
-        HANDLE_ERROR(IO_ERROR, "Amount written to bulk was incorrect");
-    }
-    return SUCCESS;
-}
-
-Result writeToBulk(Device device, unsigned char command[64]) {
-    int amt_written;
-    HANDLE_ERROR(
-        libusb_bulk_transfer(device.handle, 0x02, command, 64, &amt_written, TIMEOUT),
-        "Failed to write to bulk with libusb error");
-
-    if (amt_written != 64) {
         HANDLE_ERROR(IO_ERROR, "Amount written to bulk was incorrect");
     }
     return SUCCESS;
@@ -103,14 +112,8 @@ Result closeDevice(Device device) {
 Result sendCommandGetResponse(Device device, unsigned char command[64],
                               unsigned char response[64]) {
     HANDLE_ERROR_DONT_RETURN(_clearReadBuffer(device), "Failed to clear read buffer");
-    HANDLE_ERROR(writeToBulk(device, command), "Failed to write command to bulk");
-    HANDLE_ERROR(readFromBulk(device, response), "Failed to read response from bulk");
+    HANDLE_ERROR(_writeToBulk(device, command), "Failed to write command to bulk");
+    HANDLE_ERROR(_readFromBulk(device, response), "Failed to read response from bulk");
     HANDLE_ERROR_DONT_RETURN(_commandUnderstood(response), "Command was not understood");
-    return SUCCESS;
-}
-
-Result _flushDevice(Device device) {
-    HANDLE_ERROR(_writeToControl(device, 0x01),
-                 "Failed to send flush command to control");
     return SUCCESS;
 }

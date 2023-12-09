@@ -2,6 +2,7 @@
 #define CONTROL_H
 
 #include "Driver.h"
+
 // Setters
 Result setHighSpeed(Device device, int high_speed);
 Result setLowSpeed(Device device, int low_speed);
@@ -17,16 +18,17 @@ Result getHighSpeed(Device device, int *high_speed);
 Result getPosition(Device device, int *position);
 Result getMotorStatus(Device device, int *status);
 
-double _getElapsedTime(struct timespec start_time, struct timespec end_time);
-
 // Misc
 Result turnMotorOn(Device device);
 Result turnMotorOff(Device device);
-Result waitForMotorIdle(Device device, FILE *file, struct timespec time);
+Result waitForMotorIdle(Device device, FILE *file, struct timespec start_time,
+                        struct timespec current_time);
 void _toUpperCase(unsigned char *string);
 Result interactiveMode(Device device);
 Result writeMotorDriverSettings(Device device);
 Result readMotorDriverSettings(Device device);
 Result moveStage(Device device, int position);
+
+#include "Calibration.h"
 
 #endif
