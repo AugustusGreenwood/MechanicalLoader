@@ -59,7 +59,7 @@
         }                                                                                \
     } while (0)
 
-// These are all just libusb errors
+// These are all just libusb errors with just a few of mine
 typedef enum Result {
     ARCUS_ERROR = 1,
     INPUT_ERROR = 2,

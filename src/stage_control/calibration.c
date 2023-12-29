@@ -1,9 +1,6 @@
-#include "calibration.h"
-#include "result.h"
-#include "stage_commands.h"
-#include <bits/time.h>
+#include "calibration_p.h"
+#include "commands_p.h"
 #include <string.h>
-#include <time.h>
 
 Result _getCalibrateParametersFromFile(CalibrateParameters *params) {
     FILE *file = fopen("./CalibrateInput.txt", "r");

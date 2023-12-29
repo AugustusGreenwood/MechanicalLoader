@@ -1,4 +1,5 @@
-#include "stage_driver.h"
+#include "driver_p.h"
+#include <assert.h>
 
 const int TIMEOUT = 3000;
 const int VENDOR_ID = 0x1589;
@@ -114,6 +115,8 @@ Result sendCommandGetResponse(Device device, unsigned char command[64],
     HANDLE_ERROR_DONT_RETURN(_clearReadBuffer(device), "Failed to clear read buffer");
     HANDLE_ERROR(_writeToBulk(device, command), "Failed to write command to bulk");
     HANDLE_ERROR(_readFromBulk(device, response), "Failed to read response from bulk");
-    HANDLE_ERROR_DONT_RETURN(_commandUnderstood(response), "Command was not understood");
+    // In almost all cases, unless we are debugging, we aren't worried if the command
+    // was understood so i make this an assert to be deleted on higher optimized builds
+    assert(_commandUnderstood(response) == SUCCESS);
     return SUCCESS;
 }

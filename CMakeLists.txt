@@ -7,9 +7,10 @@ project(MechanicalLoader)
 
 set(SOURCE_FILES
     src/main.c
-    src/stage_driver/stage_driver.c
-    src/stage_control/stage_commands.c
+    src/stage_control/driver.c
+    src/stage_control/commands.c
     src/stage_control/calibration.c
+    src/stage_control/run.c
 )
 
 option(DEBUGLOG "Print all debug information" ON)
@@ -25,7 +26,6 @@ target_include_directories(MechanicalLoader
     PUBLIC
         include/
     PRIVATE
-        src/stage_driver/
         src/stage_control/
         src/result/
 )

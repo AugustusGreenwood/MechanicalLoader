@@ -1,7 +1,7 @@
 #ifndef CALIBRATION_H
 #define CALIBRATION_H
 
-#include <stage_commands.h>
+#include "result_p.h"
 
 typedef struct CalibrateParameters {
     int high_speed;
@@ -18,6 +18,5 @@ typedef struct CalibrateParameters {
 } CalibrateParameters;
 
 Result _getCalibrateParametersFromFile(CalibrateParameters *params);
-Result _prepareDeviceForCalibration(Device device, CalibrateParameters params);
 
 #endif

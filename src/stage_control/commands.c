@@ -1,20 +1,8 @@
-#include "stage_commands.h"
-#include "result.h"
+#include "commands_p.h"
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
-/*
-All these function will follow a general structure:
-1. Create variables to store command and response
-2. HANDLE_ERROR will check to make sure all is good
-3. assuming no errors, return SUCCESS
-
-Extras will be discussed per function
-*/
-
-typedef struct timespec timespec;
 
 // TODO error message
 Result setHighSpeed(Device device, int high_speed) {
@@ -266,17 +254,3 @@ Result moveStage(Device device, int position) {
     HANDLE_ERROR(sendCommandGetResponse(device, command, response), "MESSAGE");
     return SUCCESS;
 }
-
-// Result runCycle(Device device, int distance, timespec start_time, FILE *file,
-//                 timespec *current_time, timespec *start_cycle_time,
-//                 timespec *end_cycle_time, double *elapsed_time) {
-//     clock_gettime(CLOCK_MONOTONIC, start_cycle_time);
-//     HANDLE_ERROR(moveStage(device, -distance), "FAIL");
-//     HANDLE_ERROR(waitForMotorIdle(device, file, start_time, current_time), "FAIL");
-//     HANDLE_ERROR(moveStage(device, distance), "FAIL");
-//     HANDLE_ERROR(waitForMotorIdle(device, file, start_time, current_time), "FAIL");
-//     //    HANDLE_ERROR(_getElapsedTime(*start_cycle_time, end_cycle_time,
-//     elapsed_time),
-//     //                 "FAIL");
-//     return SUCCESS;
-// }
