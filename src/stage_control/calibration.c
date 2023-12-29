@@ -1,8 +1,8 @@
-#include "calibration_p.h"
-#include "commands_p.h"
+#include "calibration.h"
+#include "commands.h"
 #include <string.h>
 
-Result _getCalibrateParametersFromFile(CalibrateParameters *params) {
+Result _get_calibrate_parameters_from_file(CalibrateParameters *params) {
     FILE *file = fopen("./CalibrateInput.txt", "r");
     char buffer[96];
     char variable[96];
@@ -58,13 +58,13 @@ Result _getCalibrateParametersFromFile(CalibrateParameters *params) {
 
 // TODO error messages
 Result _prepareDeviceForCalibration(Device device, CalibrateParameters params) {
-    HANDLE_ERROR(setHighSpeed(device, params.high_speed), "CAL HIGH");
-    HANDLE_ERROR(setAccelerationTime(device, params.acceleration_time), "cal accel");
-    HANDLE_ERROR(setIdleTime(device, params.idle_time), "cal idle");
-    HANDLE_ERROR(setAccelerationProfile(device, params.sin_curve), "cal scurve");
-    HANDLE_ERROR(setMicrostepping(device, 50), "cal mciro");
-    HANDLE_ERROR(setIdleTime(device, 1), "cal idle");
-    HANDLE_ERROR(writeMotorDriverSettings(device), "cal write");
-    HANDLE_ERROR(setPosition(device, 0), "CAL pos");
+    HANDLE_ERROR(set_high_speed(device, params.high_speed), "CAL HIGH");
+    HANDLE_ERROR(set_acceleration_time(device, params.acceleration_time), "cal accel");
+    HANDLE_ERROR(set_idle_time(device, params.idle_time), "cal idle");
+    HANDLE_ERROR(set_acceleration_profile(device, params.sin_curve), "cal scurve");
+    HANDLE_ERROR(set_microstepping(device, 50), "cal mciro");
+    HANDLE_ERROR(set_idle_time(device, 1), "cal idle");
+    HANDLE_ERROR(write_motor_driver_settings(device), "cal write");
+    HANDLE_ERROR(set_position(device, 0), "CAL pos");
     return SUCCESS;
 }

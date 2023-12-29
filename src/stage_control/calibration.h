@@ -1,7 +1,7 @@
 #ifndef CALIBRATION_H
 #define CALIBRATION_H
 
-#include "result_p.h"
+#include "result.h"
 
 typedef struct CalibrateParameters {
     int high_speed;
@@ -17,6 +17,6 @@ typedef struct CalibrateParameters {
     int sin_curve;
 } CalibrateParameters;
 
-Result _getCalibrateParametersFromFile(CalibrateParameters *params);
+Result _get_calibrate_parameters_from_file(CalibrateParameters *params);
 
 #endif

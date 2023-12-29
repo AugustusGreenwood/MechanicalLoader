@@ -13,7 +13,11 @@ set(SOURCE_FILES
     src/stage_control/run.c
 )
 
-option(DEBUGLOG "Print all debug information" ON)
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    option(DEBUGLOG "Print all debug information" OFF)
+else()
+    option(DEBUGLOG "Print all debug information" ON)
+endif()
 if(DEBUGLOG)
     add_definitions(-DDEBUGLOG)
 endif(DEBUGLOG)

@@ -1,19 +1,11 @@
-#ifndef STAGE_CONTROL_H
-#define STAGE_CONTROL_H
+#ifndef COMMANDS_H
+#define COMMANDS_H
 
-#include "result.h"
+#include "driver.h"
+#include <time.h>
 
-// DRIVER
-typedef struct Device {
-    struct libusb_context *context;
-    struct libusb_device_handle *handle;
-    int iface_number;
-} Device;
-Result open_device(Device *device);
-Result close_device(Device device);
-Result send_command_get_response(Device device, unsigned char command[64],
-                                 unsigned char response[64]);
-// COMMANDS
+typedef struct timespec timespec;
+void _to_upper_case(unsigned char *string);
 Result set_high_speed(Device device, int high_speed);
 Result set_low_speed(Device device, int low_speed);
 Result set_acceleration_time(Device device, int accel_time);
@@ -32,8 +24,7 @@ Result interactive_mode(Device device);
 Result write_motor_driver_settings(Device device);
 Result read_motor_driver_settings(Device device);
 Result move_stage(Device device, int position);
-
-// CALIBRATION
-typedef struct CalibrateParameters CalibrateParameters;
+Result wait_for_motor_idle(Device device, const timespec start_time, FILE *file);
+Result move_cycle(Device device, const int amplitude, timespec *start_time, FILE *file);
 
 #endif

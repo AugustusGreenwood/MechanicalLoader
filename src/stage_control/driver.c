@@ -1,25 +1,18 @@
-#include "driver_p.h"
+#include "driver.h"
 #include <assert.h>
 
 const int TIMEOUT = 3000;
 const int VENDOR_ID = 0x1589;
 const int PRODUCT_ID = 0xa101;
 
-Result _writeToControl(Device device, const int value) {
+Result _write_to_control(Device device, const int value) {
     HANDLE_ERROR(
         libusb_control_transfer(device.handle, 0x40, 0x02, value, 0x00, NULL, 0, TIMEOUT),
         "Failed to write to control with libusb error");
     return SUCCESS;
 }
 
-Result _commandUnderstood(const unsigned char *response) {
-    if (response[0] == '?') {
-        return IO_ERROR;
-    }
-    return SUCCESS;
-}
-
-Result _clearReadBuffer(Device device) {
+Result _clear_read_buffer(Device device) {
     unsigned char _buffer[4096];
     int transferred;
     HANDLE_ERROR_UNLESS(TIMEOUT_ERROR,
@@ -30,13 +23,13 @@ Result _clearReadBuffer(Device device) {
     return SUCCESS;
 }
 
-Result _flushDevice(Device device) {
-    HANDLE_ERROR(_writeToControl(device, 0x01),
+Result _flush_device(Device device) {
+    HANDLE_ERROR(_write_to_control(device, 0x01),
                  "Failed to send flush command to control");
     return SUCCESS;
 }
 
-Result _writeToBulk(Device device, unsigned char command[64]) {
+Result _write_to_bulk(Device device, unsigned char command[64]) {
     int amt_written;
     HANDLE_ERROR(
         libusb_bulk_transfer(device.handle, 0x02, command, 64, &amt_written, TIMEOUT),
@@ -48,7 +41,7 @@ Result _writeToBulk(Device device, unsigned char command[64]) {
     return SUCCESS;
 }
 
-Result openDevice(Device *device) {
+Result open_device(Device *device) {
     HANDLE_ERROR(libusb_init(&device->context),
                  "Failed to initialize libusb library, restart program");
 
@@ -67,11 +60,11 @@ Result openDevice(Device *device) {
             HANDLE_ERROR(libusb_claim_interface(device->handle, device->iface_number),
                          "Device found, opened, but claiming interface failed");
 
-            HANDLE_ERROR(_writeToControl(*device, 0x02),
+            HANDLE_ERROR(_write_to_control(*device, 0x02),
                          "Device found, opened with libusb, interface claimed but failed "
                          "to write open command to control endpoint");
 
-            HANDLE_ERROR_UNLESS(TIMEOUT_ERROR, _clearReadBuffer(*device),
+            HANDLE_ERROR_UNLESS(TIMEOUT_ERROR, _clear_read_buffer(*device),
                                 "Failed to clear read buffer after opening");
 
             return SUCCESS;
@@ -87,7 +80,7 @@ Result openDevice(Device *device) {
     return NOT_FOUND_ERROR;
 }
 
-Result _readFromBulk(Device device, unsigned char output[64]) {
+Result _read_from_bulk(Device device, unsigned char output[64]) {
     int amt_read;
     HANDLE_ERROR(
         libusb_bulk_transfer(device.handle, 0x82, output, 64, &amt_read, TIMEOUT),
@@ -99,8 +92,8 @@ Result _readFromBulk(Device device, unsigned char output[64]) {
     return SUCCESS;
 }
 
-Result closeDevice(Device device) {
-    HANDLE_ERROR(_writeToControl(device, 0x04),
+Result close_device(Device device) {
+    HANDLE_ERROR(_write_to_control(device, 0x04),
                  "Failed to send close command to control endpoint.");
 
     HANDLE_ERROR(libusb_release_interface(device.handle, device.iface_number),
@@ -110,13 +103,10 @@ Result closeDevice(Device device) {
     return SUCCESS;
 }
 
-Result sendCommandGetResponse(Device device, unsigned char command[64],
-                              unsigned char response[64]) {
-    HANDLE_ERROR_DONT_RETURN(_clearReadBuffer(device), "Failed to clear read buffer");
-    HANDLE_ERROR(_writeToBulk(device, command), "Failed to write command to bulk");
-    HANDLE_ERROR(_readFromBulk(device, response), "Failed to read response from bulk");
-    // In almost all cases, unless we are debugging, we aren't worried if the command
-    // was understood so i make this an assert to be deleted on higher optimized builds
-    assert(_commandUnderstood(response) == SUCCESS);
+Result send_command_get_response(Device device, unsigned char command[64],
+                                 unsigned char response[64]) {
+    HANDLE_ERROR_DONT_RETURN(_clear_read_buffer(device), "Failed to clear read buffer");
+    HANDLE_ERROR(_write_to_bulk(device, command), "Failed to write command to bulk");
+    HANDLE_ERROR(_read_from_bulk(device, response), "Failed to read response from bulk");
     return SUCCESS;
 }

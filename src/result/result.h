@@ -10,13 +10,14 @@
 #ifdef DEBUGLOG
 #define LOG_ERROR(result, msg)                                                           \
     do {                                                                                 \
-        printf("Error occured, information is:\n"                                        \
-               "Code:      %i\n"                                                         \
-               "File:      %s\n"                                                         \
-               "Line:      %i\n"                                                         \
-               "Function:  %s\n"                                                         \
-               "Message:   %s\n",                                                        \
-               result, __FILE__, __LINE__, __FUNCTION__, msg);                           \
+        fprintf(stderr,                                                                  \
+                "Error occured, information is:\n"                                       \
+                "Code:      %i\n"                                                        \
+                "File:      %s\n"                                                        \
+                "Line:      %i\n"                                                        \
+                "Function:  %s\n"                                                        \
+                "Message:   %s\n",                                                       \
+                result, __FILE__, __LINE__, __FUNCTION__, msg);                          \
     } while (0)
 #else
 #define LOG_ERROR(result, msg)                                                           \
