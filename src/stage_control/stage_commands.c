@@ -1,4 +1,9 @@
-#include "Control.h"
+#include "stage_commands.h"
+#include "result.h"
+#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 /*
 All these function will follow a general structure:
@@ -8,6 +13,8 @@ All these function will follow a general structure:
 
 Extras will be discussed per function
 */
+
+typedef struct timespec timespec;
 
 // TODO error message
 Result setHighSpeed(Device device, int high_speed) {
@@ -151,34 +158,36 @@ Result turnMotorOff(Device device) {
     return SUCCESS;
 }
 
-double _getElapsedTime(struct timespec start_time, struct timespec end_time) {
-    clock_gettime(CLOCK_MONOTONIC, &end_time);
-    return (end_time.tv_sec - start_time.tv_sec) +
-           (end_time.tv_nsec - start_time.tv_nsec) / 1e9;
-}
+// Result _getElapsedTime(const timespec start_time, timespec *end_time,
+//                        double *elapsed_time) {
+//     clock_gettime(CLOCK_MONOTONIC, end_time);
+//     *elapsed_time = (end_time->tv_sec - start_time.tv_sec) +
+//                     (end_time->tv_nsec - start_time.tv_nsec) / 1e9;
+//     return SUCCESS;
+// }
 
 // TODO Error message and write to file
-Result waitForMotorIdle(Device device, FILE *file, struct timespec start_time,
-                        struct timespec current_time) {
-    if (file == NULL) {
-        int status;
-        do {
-            HANDLE_ERROR(getMotorStatus(device, &status), "MESSAHE");
-        } while (status != 0);
-        return SUCCESS;
-    }
-
-    int status;
-    int position;
-    double time;
-    do {
-        HANDLE_ERROR(getPosition(device, &position), "MESSAHE");
-        time = _getElapsedTime(start_time, current_time);
-        fprintf(file, "%i,%lf\n", position, time);
-        HANDLE_ERROR(getMotorStatus(device, &status), "MESSAHE");
-    } while (status != 0);
-    return SUCCESS;
-}
+// Result waitForMotorIdle(Device device, FILE *file, const timespec start_time,
+//                         timespec *current_time) {
+//     if (file == NULL) {
+//         int status;
+//         do {
+//             HANDLE_ERROR(getMotorStatus(device, &status), "MESSAHE");
+//         } while (status != 0);
+//         return SUCCESS;
+//     }
+//
+//     int status;
+//     int position;
+//     double time;
+//     do {
+//         HANDLE_ERROR(getPosition(device, &position), "MESSAHE");
+//         // HANDLE_ERROR(_getElapsedTime(start_time, current_time, &time), "FAIL");
+//         // fprintf(file, "%lf,%i\n", time, position);
+//         HANDLE_ERROR(getMotorStatus(device, &status), "MESSAHE");
+//     } while (status != 0);
+//     return SUCCESS;
+// }
 
 void _toUpperCase(unsigned char *string) {
     for (unsigned long i = 0; i < strlen((char *)string); i++) {
@@ -198,10 +207,12 @@ Result interactiveMode(Device device) {
             break;
         }
 
-        HANDLE_ERROR_UNLESS(IO_ERROR, sendCommandGetResponse(device, command, response),
-                            "MESSAHE");
+        printf("\x1b[1F"); // Move to beginning of previous line
+        printf("\x1b[2K"); // Clear entire line
 
-        printf("%s\n", response);
+        sendCommandGetResponse(device, command, response);
+
+        printf("%s --> %s\n", command, response);
     }
     return SUCCESS;
 }
@@ -255,3 +266,17 @@ Result moveStage(Device device, int position) {
     HANDLE_ERROR(sendCommandGetResponse(device, command, response), "MESSAGE");
     return SUCCESS;
 }
+
+// Result runCycle(Device device, int distance, timespec start_time, FILE *file,
+//                 timespec *current_time, timespec *start_cycle_time,
+//                 timespec *end_cycle_time, double *elapsed_time) {
+//     clock_gettime(CLOCK_MONOTONIC, start_cycle_time);
+//     HANDLE_ERROR(moveStage(device, -distance), "FAIL");
+//     HANDLE_ERROR(waitForMotorIdle(device, file, start_time, current_time), "FAIL");
+//     HANDLE_ERROR(moveStage(device, distance), "FAIL");
+//     HANDLE_ERROR(waitForMotorIdle(device, file, start_time, current_time), "FAIL");
+//     //    HANDLE_ERROR(_getElapsedTime(*start_cycle_time, end_cycle_time,
+//     elapsed_time),
+//     //                 "FAIL");
+//     return SUCCESS;
+// }

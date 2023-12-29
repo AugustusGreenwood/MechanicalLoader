@@ -1,8 +1,11 @@
-#include "Calibration.h"
-#include <stdio.h>
+#include "calibration.h"
+#include "result.h"
+#include "stage_commands.h"
+#include <bits/time.h>
 #include <string.h>
+#include <time.h>
 
-Result getCalibrateParametersFromFile(CalibrateParameters *params) {
+Result _getCalibrateParametersFromFile(CalibrateParameters *params) {
     FILE *file = fopen("./CalibrateInput.txt", "r");
     char buffer[96];
     char variable[96];
@@ -35,7 +38,15 @@ Result getCalibrateParametersFromFile(CalibrateParameters *params) {
         } else if (strcmp(variable, "MaxSpeed") == 0) {
             params->max_speed = value;
         } else if (strcmp(variable, "Tolerance") == 0) {
+            if (value >= 1) {
+                HANDLE_ERROR(INPUT_ERROR, "invalied tolerance level");
+            }
             params->tolerance = value;
+        } else if (strcmp(variable, "SCurve") == 0) {
+            if (value != 0 && value != 1) {
+                HANDLE_ERROR(INPUT_ERROR, "Incorrect scrve arguemnt");
+            }
+            params->sin_curve = value;
         } else {
             char error_out[96];
             sprintf(error_out, "Was unable to read line %i. Variable was read as %s\n",
@@ -53,6 +64,7 @@ Result _prepareDeviceForCalibration(Device device, CalibrateParameters params) {
     HANDLE_ERROR(setHighSpeed(device, params.high_speed), "CAL HIGH");
     HANDLE_ERROR(setAccelerationTime(device, params.acceleration_time), "cal accel");
     HANDLE_ERROR(setIdleTime(device, params.idle_time), "cal idle");
+    HANDLE_ERROR(setAccelerationProfile(device, params.sin_curve), "cal scurve");
     HANDLE_ERROR(setMicrostepping(device, 50), "cal mciro");
     HANDLE_ERROR(setIdleTime(device, 1), "cal idle");
     HANDLE_ERROR(writeMotorDriverSettings(device), "cal write");

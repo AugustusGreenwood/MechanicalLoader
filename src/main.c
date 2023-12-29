@@ -1,4 +1,6 @@
-#include "Calibrate.h"
+#include "stage_commands.h"
+#include "stage_control.h"
+#include "stage_driver.h"
 
 int main() {
     Device device = {0};
@@ -6,11 +8,6 @@ int main() {
 
     interactiveMode(device);
 
-    CalibrateParameters params;
-    getCalibrateParametersFromFile(&params);
-    _prepareDeviceForCalibration(device, params);
-
-    interactiveMode(device);
-
     closeDevice(device);
+    return 0;
 }

@@ -5,16 +5,11 @@ set(CMAKE_CXX_COMPILER "clang++")
 
 project(MechanicalLoader)
 
-include_directories(
-    src/driver/
-    src/control/
-)
-
 set(SOURCE_FILES
     src/main.c
-    src/driver/driver.c
-    src/control/control.c
-    src/control/calibration.c
+    src/stage_driver/stage_driver.c
+    src/stage_control/stage_commands.c
+    src/stage_control/calibration.c
 )
 
 option(DEBUGLOG "Print all debug information" ON)
@@ -25,5 +20,14 @@ endif(DEBUGLOG)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native -Wall -Wextra")
 
 add_executable(MechanicalLoader ${SOURCE_FILES})
+
+target_include_directories(MechanicalLoader 
+    PUBLIC
+        include/
+    PRIVATE
+        src/stage_driver/
+        src/stage_control/
+        src/result/
+)
 
 target_link_libraries(MechanicalLoader usb-1.0)

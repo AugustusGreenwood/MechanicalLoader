@@ -1,7 +1,7 @@
 #ifndef DRIVER_H
 #define DRIVER_H
 
-#include "Result.h"
+#include "result.h"
 #include <libusb-1.0/libusb.h>
 
 typedef struct Device {

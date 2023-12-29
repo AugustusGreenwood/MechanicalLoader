@@ -1,7 +1,7 @@
-#ifndef CONTROL_H
-#define CONTROL_H
+#ifndef COMMANDS_H
+#define COMMANDS_H
 
-#include "Driver.h"
+#include "stage_driver.h"
 
 // Setters
 Result setHighSpeed(Device device, int high_speed);
@@ -21,14 +21,17 @@ Result getMotorStatus(Device device, int *status);
 // Misc
 Result turnMotorOn(Device device);
 Result turnMotorOff(Device device);
-Result waitForMotorIdle(Device device, FILE *file, struct timespec start_time,
-                        struct timespec current_time);
-void _toUpperCase(unsigned char *string);
+// Result waitForMotorIdle(Device device, FILE *file, const struct timespec start_time,
+//                        struct timespec *current_time);
 Result interactiveMode(Device device);
 Result writeMotorDriverSettings(Device device);
 Result readMotorDriverSettings(Device device);
 Result moveStage(Device device, int position);
-
-#include "Calibration.h"
-
+/*
+ * Open to better possiblities for all the time but currently it is like this to prevent
+ * always initializing time varaible to hopefully be quicker?
+ */
+Result runCycle(Device device, int distance, struct timespec start_time, FILE *file,
+                struct timespec *current_time, struct timespec *start_cycle_time,
+                struct timespec *end_cycle_time, double *elapsed_time);
 #endif
