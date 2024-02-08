@@ -1,8 +1,8 @@
-HighSpeed 100
+HighSpeed 8800
 AccelerationTime 1
 IdleTime 1
 AveragingCycles 3
-Amplitude 400
+Amplitude 8500
 Period 3
 DwellTime 1
 Factor 2

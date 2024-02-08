@@ -4,14 +4,14 @@ const int TIMEOUT = 3000;
 const int VENDOR_ID = 0x1589;
 const int PRODUCT_ID = 0xa101;
 
-Result _write_to_control(Device device, const int value) {
+static Result _write_to_control(Device device, const int value) {
     HANDLE_ERROR(
         libusb_control_transfer(device.handle, 0x40, 0x02, value, 0x00, NULL, 0, TIMEOUT),
         "Failed to write to control with libusb error");
     return SUCCESS;
 }
 
-Result _clear_read_buffer(Device device) {
+static Result _clear_read_buffer(Device device) {
     unsigned char _buffer[4096];
     int transferred;
     HANDLE_ERROR_UNLESS(TIMEOUT_ERROR,
@@ -22,13 +22,13 @@ Result _clear_read_buffer(Device device) {
     return SUCCESS;
 }
 
-Result _flush_device(Device device) {
+static Result _flush_device(Device device) {
     HANDLE_ERROR(_write_to_control(device, 0x01),
                  "Failed to send flush command to control");
     return SUCCESS;
 }
 
-Result _write_to_bulk(Device device, unsigned char command[64]) {
+static Result _write_to_bulk(Device device, unsigned char command[64]) {
     int amt_written;
     HANDLE_ERROR(
         libusb_bulk_transfer(device.handle, 0x02, command, 64, &amt_written, TIMEOUT),
@@ -79,7 +79,7 @@ Result open_device(Device *device) {
     return NOT_FOUND_ERROR;
 }
 
-Result _read_from_bulk(Device device, unsigned char output[64]) {
+static Result _read_from_bulk(Device device, unsigned char output[64]) {
     int amt_read;
     HANDLE_ERROR(
         libusb_bulk_transfer(device.handle, 0x82, output, 64, &amt_read, TIMEOUT),

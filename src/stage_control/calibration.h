@@ -6,7 +6,6 @@
 typedef struct CalibrateParameters {
     int high_speed;
     int acceleration_time;
-    int idle_time;
     int averaging_cycles;
     int amplitude;
     int period;
@@ -16,7 +15,5 @@ typedef struct CalibrateParameters {
     int tolerance;
     int sin_curve;
 } CalibrateParameters;
-
-Result _get_calibrate_parameters_from_file(CalibrateParameters *params);
 
 #endif
