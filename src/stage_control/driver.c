@@ -54,7 +54,7 @@ Result open_device(Device *device) {
 
         if ((descriptor.idProduct == PRODUCT_ID) && (descriptor.idVendor == VENDOR_ID)) {
             HANDLE_ERROR(libusb_open(list[i], &device->handle),
-                         "Device found but failed to successfully open");
+                         "Device found but failed to successfully open handle");
 
             HANDLE_ERROR(libusb_claim_interface(device->handle, device->iface_number),
                          "Device found, opened, but claiming interface failed");
@@ -71,8 +71,8 @@ Result open_device(Device *device) {
     }
     libusb_free_device_list(list, 1);
 
-    // This gave an annoying "Not all path returned" or something so this doesn't
-    // return and instread i return at the nd of the function
+    // This gave an annoying "Not all path returned" warning in my lsp or something so
+    // this doesn't return and instread i return at the nd of the function
     HANDLE_ERROR_DONT_RETURN(NOT_FOUND_ERROR,
                              "All devices successfully iterated but specified "
                              "vendor and product ids not found");
