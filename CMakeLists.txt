@@ -37,4 +37,4 @@ target_include_directories(NSCA1_stepper_motor_control
         src/lua/
 )
 
-target_link_libraries(NSCA1_stepper_motor_control usb-1.0 lua)
+target_link_libraries(NSCA1_stepper_motor_control usb-1.0 luajit-5.1 lua)
