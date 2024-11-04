@@ -3,7 +3,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_COMPILER "clang")
 set(CMAKE_CXX_COMPILER "clang++")
 
-project(NSCA1_stepper_motor_control)
+project(c_arcus_performax_control)
 
 set(SOURCE_FILES
     src/main.c
@@ -23,12 +23,12 @@ if(DEBUGLOG)
     add_definitions(-DDEBUGLOG)
 endif(DEBUGLOG)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native -fPIC -Wall -Wextra")
+#add_library(c_arcus_performax_control SHARED ${SOURCE_FILES})
+add_executable(c_arcus_performax_control ${SOURCE_FILES})
 
-#add_library(NSCA1_stepper_motor_control SHARED ${SOURCE_FILES})
-add_executable(NSCA1_stepper_motor_control ${SOURCE_FILES})
+target_compile_options(c_arcus_performax_control PRIVATE -march=native -Wall -Wextra -fPIC)
 
-target_include_directories(NSCA1_stepper_motor_control 
+target_include_directories(c_arcus_performax_control
     PUBLIC
         include/
     PRIVATE
@@ -37,4 +37,4 @@ target_include_directories(NSCA1_stepper_motor_control
         src/lua/
 )
 
-target_link_libraries(NSCA1_stepper_motor_control usb-1.0 luajit-5.1 lua)
+target_link_libraries(c_arcus_performax_control usb-1.0 luajit-5.1)
